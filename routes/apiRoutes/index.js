@@ -1,6 +1,6 @@
 const notes = require('express').Router();
 const { v4: uuidv4 } = require('uuid');
-const { readAndAppend, readFromFile } = require('../../helpers/fsUtils');
+const { readAndAppend, readFromFile, writeToFile } = require('../../helpers/fsUtils');
 
 // GET Route for retrieving notes information
 notes.get('/notes', (req, res) => {
@@ -20,7 +20,7 @@ notes.post('/notes', (req, res) => {
     title: req.body.title,
     text: req.body.text
   };
-
+//this read and append uses the path from the server, not the index.js file
   if (true) {
     readAndAppend(payload, './db/db.json');
     res.json({
@@ -33,5 +33,16 @@ notes.post('/notes', (req, res) => {
     });
   }
 });
+//colon is basically saying var = whatever is after the colon
+//params is what you call variables in your route
+notes.delete('/notes/:id', (req, res) =>{
+console.log(req.params.id)
+readFromFile('./db/db.json').then((data) => {
+  var noteArray = JSON.parse(data);
+  var newArray = noteArray.filter(note => req.params.id !== note.id )
+  writeToFile('./db/db.json', newArray)
+  res.json(noteArray)
+})
+})
 
 module.exports = notes;
